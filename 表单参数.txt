@@ -1,0 +1,30 @@
+https://buyin.jinritemai.com/api/bidding/event/promotion/apply?msToken=Mgd6uVtWGA4McZq00YY9kchciIYnMKjtPABpwg3abACzx1-K0ZjktMOnH65xp0opKIPYcBc7FAB4voZ8M2y1J-KcmPbvWjxNWxw225wikgF8GxvLGRh1aaQ=&X-Bogus=DFSzswVLGIRUSbJAS1q-/RXAIQ-r&_signature=_02B4Z6wo000012bAcXgAAIDCBcqxENpidGNmwHXAALuIR9l8qnEG.EtDyjeTiHALJa2kQY4ls93Oe4W3EcPeovFr1CoH3R2kxipRRlNB0qgyTlAeA6fpX4gxS6XyzjEd0j8BdGzFpE5P8BJI66
+
+//click 函数 js:331
+
+event_id: 7110074651950367010
+promotion_id: 3559505763879750762
+price: 12300
+rate: 31
+support_custom_rate: 0
+stock: 123
+delivery_time_type: 1
+contact_user: 1aa
+phone_num: 15311111111
+wechat_id: 
+remark: 1231231
+institution_activity_id: 441247
+
+
+event_id: 7118837581823017257
+promotion_id: 3559505763879750762
+price: 12300
+rate: 31
+support_custom_rate: 0
+stock: 155
+delivery_time_type: 1
+contact_user: 1aa
+phone_num: 15311111111
+wechat_id: 
+remark: dsfgsdfsfdsdfsdf
+institution_activity_id: 441247
