@@ -7,7 +7,8 @@
 
       <template #default>
         <div class="block">
-          <el-select v-model="selectedTemplateInfo" placeholder="请选择一个模板" @change="selectTemplate">
+          <el-select v-model="selectedTemplateInfo" value-key="templateName" placeholder="请选择一个模板"
+            @change="selectTemplate">
             <el-option v-for="item in templateInfos" :key="item.templateName" :label="item.templateName"
               :value="item" />
           </el-select>
@@ -37,19 +38,19 @@
 
   <el-dialog v-model="dialogVisible" title="模板信息编辑" width="50%" :before-close="handleClose">
 
-    <el-table :data="templateInfos" style="width: 100%">
+    <el-table :data="templateInfos" style="width: 100%" table-layout="auto">
       <el-table-column prop="templateName" label="模板名称" />
-      <el-table-column prop="price" label="合作价格" width="180" />
-      <el-table-column prop="rate" label="合作佣金率" width="180" />
-      <el-table-column prop="stock" label="供货库存" width="180" />
+      <el-table-column prop="price" label="合作价格" />
+      <el-table-column prop="rate" label="合作佣金率" />
+      <el-table-column prop="stock" label="供货库存" />
       <el-table-column prop="delivery_time_type" label="发货周期" />
       <el-table-column prop="contact_user" label="联系人" />
       <el-table-column prop="phone_num" label="手机号" />
       <el-table-column prop="wechat_id" label="微信号" />
       <el-table-column prop="remark" label="商品卖点" />
-      <el-table-column fixed="right" label="Operations" width="120">
+      <el-table-column fixed="right" label="操作">
         <template #default="scope">
-          <el-button link type="primary" size="small" @click.prevent="deleteRow(scope.$index)">
+          <el-button type="danger" size="small" @click.prevent="deleteRow(scope.$index)">
             删除
           </el-button>
         </template>
@@ -58,6 +59,9 @@
 
 
     <el-form :model="templateForm" label-width="120px">
+      <el-form-item label="消息模板名称">
+        <el-input v-model="templateForm.templateName" />
+      </el-form-item>
       <el-form-item label="合作价格">
         <el-input v-model="templateForm.price" />
       </el-form-item>
@@ -171,37 +175,17 @@ function signup(params: params) {
   });
 }
 
-interface TemplateInfo {
-  templateName: string;
-  price: number;
-  rate: number;
-  support_custom_rate: number;
-  stock: number;
-  delivery_time_type: number;
-  contact_user: string;
-  phone_num: string;
-  wechat_id: string;
-  remark: string;
-}
+
 
 //模板信息
 let templateInfos: Ref<any[]> = ref([])
 freshTemplateInfos()
-let defalutFrom = {
-  templateName: "默认模板",
-  price: 0,
-  rate: 0,
-  support_custom_rate: 0,
-  stock: 0,
-  delivery_time_type: 0,
-  contact_user: "",
-  phone_num: "",
-  wechat_id: "",
-  remark: "",
-};
+
 
 let selectedTemplateInfo = ref({});
-let templateForm: any = reactive
+let str = localStorage.getItem('selectedTemplateInfo')
+selectedTemplateInfo.value = JSON.parse(str as string)
+let templateForm: any = reactive({})
 
 let timeout = ref(1);
 let batchNum = ref(100);
@@ -238,6 +222,11 @@ async function getPromotions(num: number): Promise<any[]> {
 }
 const deleteRow = (index: number) => {
   templateInfos.value.splice(index, 1)
+  saveTemplateInfos()
+  ElMessage({
+    message: '删除成功',
+    type: 'success'
+  })
 }
 const start = async () => {
   loading.value = !loading.value;
@@ -294,19 +283,24 @@ function freshTemplateInfos() {
     templateInfos.value = []
   }
 }
+function saveTemplateInfos() {
+  localStorage.setItem("templateInfos", JSON.stringify(templateInfos.value));
+}
 const p = () => {
   popoverVisible.value = !popoverVisible.value;
 };
 const onSubmit = () => {
-  if (!templateForm.value) throw Error("模板名字不能为空");
+  console.log(templateForm);
+
+  if (!templateForm || !templateForm.templateName || !templateForm.templateName.trim()) throw Error("模板名字不能为空");
 
   templateInfos.value.push(templateForm);
 
   console.log(templateInfos);
-  localStorage.setItem("templateInfos", JSON.stringify(templateInfos));
 
+  saveTemplateInfos()
   ElMessage({
-    message: "修改成功",
+    message: "新增成功",
     type: "success",
   });
 };
@@ -316,6 +310,7 @@ const onSubmit = () => {
 
 const selectTemplate = (val: any) => {
   selectedTemplateInfo.value = val;
+  localStorage.setItem('selectedTemplateInfo', JSON.stringify(val))
 };
 
 const handleClose = (done: () => void) => {
