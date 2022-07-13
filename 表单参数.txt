@@ -16,18 +16,18 @@ remark: 1231231
 institution_activity_id: 441247
 
 
-event_id: 7118837581823017257
-promotion_id: 3559505763879750762
+event_id: 7107544896878084386
+promotion_id: 3557870730043593425
 price: 12300
 rate: 31
 support_custom_rate: 0
-stock: 155
-delivery_time_type: 1
-contact_user: 1aa
+stock: 123
+delivery_time_type: 0
+contact_user: 阿凡达
 phone_num: 15311111111
-wechat_id: 
-remark: dsfgsdfsfdsdfsdf
-institution_activity_id: 441247
+wechat_id: 撒旦发射点
+remark: 胜多负少
+institution_activity_id: 425562
 
 
 

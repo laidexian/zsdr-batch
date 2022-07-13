@@ -126,7 +126,7 @@
       <el-form-item>
         <el-button type="primary" @click="onSubmit">新增模板</el-button>
         <el-button type="info" @click="onModify">修改模板</el-button>
-        <el-button type = "danger" @click="onDelete">删除模板</el-button>
+        <el-button type="danger" @click="onDelete">删除模板</el-button>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -162,17 +162,20 @@ interface params {
 }
 
 function signup(params: params) {
-  let data={
+  let data = {
+    event_id: params.event_id,
+    promotion_id: params.promotion_id,
     price: Math.round(Number(params.price) * 100),
-  rate: Number(params.rate),
-  support_custom_rate: 0,
-  stock: Number(params.stock),
-  delivery_time_type:Number(params.delivery_time_type),
-  contact_user: "",
-  phone_num: "",
-  wechat_id: "",
-  remark: "",
-  }
+    rate: Number(params.rate),
+    support_custom_rate: 0,
+    stock: Number(params.stock),
+    delivery_time_type: Number(params.delivery_time_type),
+    contact_user: params.contact_user,
+    phone_num: params.phone_num,
+    wechat_id: params.wechat_id,
+    remark: params.remark,
+    institution_activity_id:params.institution_activity_id
+  };
   return axios({
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -318,8 +321,7 @@ const p = () => {
   popoverVisible.value = !popoverVisible.value;
 };
 const onSubmit = () => {
-
-  if(newTemplateName.value.trim()==='') throw Error('模板名字不能为空')
+  if (newTemplateName.value.trim() === "") throw Error("模板名字不能为空");
   let newTemplate = { ...defalutFrom };
   newTemplate.templateName = newTemplateName.value;
   templateInfos.push(newTemplate);
@@ -327,17 +329,17 @@ const onSubmit = () => {
   console.log(templateInfos);
   localStorage.setItem("templateInfos", JSON.stringify(templateInfos));
 
-    ElMessage({
-          message: "修改成功",
-          type: "success",
-        });
+  ElMessage({
+    message: "修改成功",
+    type: "success",
+  });
 };
 
 const onModify = () => {
-   ElMessage({
-          message: "修改成功",
-          type: "success",
-        });
+  ElMessage({
+    message: "修改成功",
+    type: "success",
+  });
   localStorage.setItem("templateInfos", JSON.stringify(templateInfos));
 };
 
@@ -346,11 +348,11 @@ const onDelete = () => {
     if (item.templateName === selectedTemplateInfo.value.templateName) {
       templateInfos.splice(index, 1);
       localStorage.setItem("templateInfos", JSON.stringify(templateInfos));
-       ElMessage({
-          message: "删除成功",
-          type: "success",
-        });
-        return
+      ElMessage({
+        message: "删除成功",
+        type: "success",
+      });
+      return;
     }
   });
 };
@@ -362,8 +364,8 @@ const selectChange = (val: any) => {
 };
 
 const selectTemplate = (val: any) => {
-  selectedTemplateInfo.value = val
-}
+  selectedTemplateInfo.value = val;
+};
 
 const handleClose = (done: () => void) => {
   ElMessageBox.confirm("可能还有未保存的数据，您确定要关闭吗？", {
