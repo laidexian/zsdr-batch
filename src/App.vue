@@ -1,40 +1,22 @@
 <template>
   <el-affix :offset="120" position="top">
-    <el-popover
-      placement="bottom"
-      :width="300"
-      v-model:visible="popoverVisible"
-    >
+    <el-popover placement="bottom" :width="300" v-model:visible="popoverVisible">
       <template #reference>
         <el-button plain @click="p">批量报名</el-button>
       </template>
 
       <template #default>
         <div class="block">
-          <el-select
-            v-model="selectedTemplateInfo"
-            placeholder="请选择一个模板"
-            @change="selectTemplate"
-          >
-            <el-option
-              v-for="item in templateInfos"
-              :key="item.templateName"
-              :label="item.templateName"
-              :value="item"
-            />
+          <el-select v-model="selectedTemplateInfo" placeholder="请选择一个模板" @change="selectTemplate">
+            <el-option v-for="item in templateInfos" :key="item.templateName" :label="item.templateName"
+              :value="item" />
           </el-select>
 
           <el-button type="primary" @click="editTemplate">编辑</el-button>
         </div>
 
         <span class="demonstration">间隔</span>
-        <el-slider
-          size="small"
-          show-stops
-          :step="1"
-          v-model="timeout"
-          :max="10"
-        />
+        <el-slider size="small" show-stops :step="1" v-model="timeout" :max="10" />
 
         <div class="block">
           <span class="demonstration">数量</span>
@@ -45,42 +27,37 @@
         <el-divider />
         <el-button-group>
           <el-button :loading="loading" type="warning" @click="start">{{
-            startText
+              startText
           }}</el-button>
-          <el-button type="danger" :disabled="!loading" @click="loading = false"
-            >停止</el-button
-          >
+          <el-button type="danger" :disabled="!loading" @click="loading = false">停止</el-button>
         </el-button-group>
       </template>
     </el-popover>
   </el-affix>
 
-  <el-dialog
-    v-model="dialogVisible"
-    title="模板信息编辑"
-    width="30%"
-    :before-close="handleClose"
-  >
+  <el-dialog v-model="dialogVisible" title="模板信息编辑" width="50%" :before-close="handleClose">
+
+    <el-table :data="templateInfos" style="width: 100%">
+      <el-table-column prop="templateName" label="模板名称" />
+      <el-table-column prop="price" label="合作价格" width="180" />
+      <el-table-column prop="rate" label="合作佣金率" width="180" />
+      <el-table-column prop="stock" label="供货库存" width="180" />
+      <el-table-column prop="delivery_time_type" label="发货周期" />
+      <el-table-column prop="contact_user" label="联系人" />
+      <el-table-column prop="phone_num" label="手机号" />
+      <el-table-column prop="wechat_id" label="微信号" />
+      <el-table-column prop="remark" label="商品卖点" />
+      <el-table-column fixed="right" label="Operations" width="120">
+        <template #default="scope">
+          <el-button link type="primary" size="small" @click.prevent="deleteRow(scope.$index)">
+            删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+
     <el-form :model="templateForm" label-width="120px">
-      <el-form-item label="信息模板">
-        <el-select
-          value-key="templateName"
-          v-model="selectedTemplateInfo"
-          filterable
-          allow-create
-          clearable
-          :reserve-keyword="false"
-          placeholder="请选择一个模板"
-          @change="selectChange"
-        >
-          <el-option
-            v-for="item in templateInfos"
-            :key="item.templateName"
-            :label="item.templateName"
-            :value="item"
-          />
-        </el-select>
-      </el-form-item>
       <el-form-item label="合作价格">
         <el-input v-model="templateForm.price" />
       </el-form-item>
@@ -94,16 +71,8 @@
       </el-form-item>
 
       <el-form-item label="发货周期">
-        <el-select
-          v-model="templateForm.delivery_time_type"
-          default-first-option
-        >
-          <el-option
-            v-for="item of 4"
-            :key="item"
-            :label="item"
-            :value="item"
-          />
+        <el-select v-model="templateForm.delivery_time_type" default-first-option>
+          <el-option v-for="item of 4" :key="item" :label="item" :value="item" />
         </el-select>
       </el-form-item>
 
@@ -125,25 +94,29 @@
 
       <el-form-item>
         <el-button type="primary" @click="onSubmit">新增模板</el-button>
-        <el-button type="info" @click="onModify">修改模板</el-button>
-        <el-button type="danger" @click="onDelete">删除模板</el-button>
       </el-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button type="warning" @click="dialogVisible = false"
-          >取消</el-button
-        >
-        <el-button type="primary" @click="dialogVisible = false"
-          >确定</el-button
-        >
+        <el-button type="warning" @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="dialogVisible = false">确定</el-button>
       </span>
     </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, reactive, Ref, ref } from "vue";
+
+import {
+  ElMessage,
+  ElMessageBox,
+  ElNotification
+} from 'element-plus'
+import 'element-plus/es/components/message/style/css'
+import 'element-plus/es/components/notification/style/css'
+import 'element-plus/es/components/message-box/style/css'
+
 import axios from "axios";
 interface params {
   templateName: string;
@@ -174,7 +147,7 @@ function signup(params: params) {
     phone_num: params.phone_num,
     wechat_id: params.wechat_id,
     remark: params.remark,
-    institution_activity_id:params.institution_activity_id
+    institution_activity_id: params.institution_activity_id
   };
   return axios({
     headers: {
@@ -212,8 +185,8 @@ interface TemplateInfo {
 }
 
 //模板信息
-let templateInfos: Array<TemplateInfo> = window.templateInfos;
-
+let templateInfos: Ref<any[]> = ref([])
+freshTemplateInfos()
 let defalutFrom = {
   templateName: "默认模板",
   price: 0,
@@ -227,14 +200,8 @@ let defalutFrom = {
   remark: "",
 };
 
-let selectedTemplateInfo = ref(defalutFrom);
-let templateForm = computed(() => {
-  if (selectedTemplateInfo.value instanceof Object) {
-    return selectedTemplateInfo.value;
-  } else {
-    return reactive(defalutFrom);
-  }
-});
+let selectedTemplateInfo = ref({});
+let templateForm: any = reactive
 
 let timeout = ref(1);
 let batchNum = ref(100);
@@ -246,7 +213,7 @@ let startText = computed(() => (loading.value ? "运行中..." : "启动"));
 
 const dialogVisible = ref(false);
 const popoverVisible = ref(false);
-let newTemplateName = ref("");
+
 
 function getCurrentEventId() {
   let match = document.URL.match(/event_id=\d+/);
@@ -269,11 +236,13 @@ async function getPromotions(num: number): Promise<any[]> {
     return await getPromotions(num);
   }
 }
-
+const deleteRow = (index: number) => {
+  templateInfos.value.splice(index, 1)
+}
 const start = async () => {
   loading.value = !loading.value;
   if (loading.value) {
-    let tempData: params;
+    let tempData: any;
     let promotions = await getPromotions(batchNum.value);
 
     let index = 0;
@@ -316,15 +285,22 @@ const start = async () => {
 const editTemplate = () => {
   dialogVisible.value = true;
 };
-
+function freshTemplateInfos() {
+  let str = localStorage.getItem('templateInfos')
+  if (str) {
+    let temp = JSON.parse(str)
+    templateInfos.value = temp
+  } else {
+    templateInfos.value = []
+  }
+}
 const p = () => {
   popoverVisible.value = !popoverVisible.value;
 };
 const onSubmit = () => {
-  if (newTemplateName.value.trim() === "") throw Error("模板名字不能为空");
-  let newTemplate = { ...defalutFrom };
-  newTemplate.templateName = newTemplateName.value;
-  templateInfos.push(newTemplate);
+  if (!templateForm.value) throw Error("模板名字不能为空");
+
+  templateInfos.value.push(templateForm);
 
   console.log(templateInfos);
   localStorage.setItem("templateInfos", JSON.stringify(templateInfos));
@@ -335,33 +311,8 @@ const onSubmit = () => {
   });
 };
 
-const onModify = () => {
-  ElMessage({
-    message: "修改成功",
-    type: "success",
-  });
-  localStorage.setItem("templateInfos", JSON.stringify(templateInfos));
-};
 
-const onDelete = () => {
-  templateInfos.forEach((item, index) => {
-    if (item.templateName === selectedTemplateInfo.value.templateName) {
-      templateInfos.splice(index, 1);
-      localStorage.setItem("templateInfos", JSON.stringify(templateInfos));
-      ElMessage({
-        message: "删除成功",
-        type: "success",
-      });
-      return;
-    }
-  });
-};
 
-const selectChange = (val: any) => {
-  if (!(val instanceof Object)) {
-    newTemplateName.value = val;
-  }
-};
 
 const selectTemplate = (val: any) => {
   selectedTemplateInfo.value = val;

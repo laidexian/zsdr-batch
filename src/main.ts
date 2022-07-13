@@ -1,19 +1,17 @@
 import { createApp } from "vue";
 import App from "./App.vue";
+import {
+  ElMessage,
+  ElMessageBox,
+  ElNotification
+} from 'element-plus'
 
+import 'element-plus/es/components/message/style/css'
 createAppDiv();
 
 let str = localStorage.getItem("templateInfos");
 //模板信息
 
-if (str) {
-  let t = JSON.parse(str);
-  window.templateInfos = t;
-  console.log(templateInfos);
-  
-}else{
-    window.templateInfos=[]
-}
 
 
 
