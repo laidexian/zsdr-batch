@@ -28,3 +28,19 @@ phone_num: 15311111111
 wechat_id: 
 remark: dsfgsdfsfdsdfsdf
 institution_activity_id: 441247
+
+
+
+
+event_id: lV.event_id,
+promotion_id: l.promotionId,
+price: Math.round(Number(R.price) * 100),
+rate: Number(R.rate),
+support_custom_rate: R.support_custom_rate ? 1 : 0,
+stock: Number(R.stock),
+delivery_time_type: Number(R.delivery_time_type),
+contact_user: R.contact_user,
+phone_num: R.phone_num,
+wechat_id: R.wechat_id,
+remark: R.remark,
+institution_activity_id: l.institutionActivityId
