@@ -18,7 +18,7 @@
         </div>
 
         <span class="demonstration">间隔</span>
-
+        <el-slider size="small" show-stops :step="1" v-model="timeout" :max="10" />
 
         <div class="block">
           <span class="demonstration">商品数量</span>
@@ -243,13 +243,13 @@ const start = async () => {
   let events = await getDaren()
   for (const id of events) {
 
-     if (!loading.value) {
-        ElMessage({
-          message: "手动停止",
-          type: "warning",
-        });
-        return;
-      }
+    if (!loading.value) {
+      ElMessage({
+        message: "手动停止",
+        type: "warning",
+      });
+      return;
+    }
     await start0(id)
     ElNotification(id + '达人处理完成。。。。。。。。。。。。。。。。')
   }
@@ -283,7 +283,7 @@ const start0 = async (event_id: number) => {
       };
 
       let { data } = await signup(tempData);
-     
+
       if (data.msg === "success") {
         ElNotification({
           title: "报名成功！",
@@ -298,10 +298,10 @@ const start0 = async (event_id: number) => {
         });
       }
       //延迟处理
-       await new Promise((resolve) => {
+      await new Promise((resolve) => {
         setTimeout(() => {
           resolve(null)
-        }, timeout.value);
+        }, timeout.value*1000);
       })
     }
   }
