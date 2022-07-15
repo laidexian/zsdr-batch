@@ -6,6 +6,7 @@
       </template>
 
       <template #default>
+        <span>默认为当前筛选的达人页面进行批量报名</span>
         <div class="block">
           <el-select v-model="selectedTemplateInfo" value-key="templateName" placeholder="请选择一个模板"
             @change="selectTemplate">
@@ -17,11 +18,11 @@
         </div>
 
         <span class="demonstration">间隔</span>
-        <el-slider size="small" show-stops :step="1" v-model="timeout" :max="10" />
+
 
         <div class="block">
-          <span class="demonstration">数量</span>
-          <el-input-number size="small" v-model="batchNum" :step="100" />
+          <span class="demonstration">商品数量</span>
+          <el-input-number size="small" v-model="goodNUm" :step="100" />
         </div>
         <el-progress :percentage="percentage"></el-progress>
 
@@ -40,7 +41,7 @@
 
     <el-table :data="templateInfos" style="width: 100%" table-layout="auto">
       <el-table-column prop="templateName" label="模板名称" />
-      <el-table-column prop="price" label="合作价格" />
+      <el-table-column prop="price" />
       <el-table-column prop="rate" label="合作佣金率" />
       <el-table-column prop="stock" label="供货库存" />
       <el-table-column prop="delivery_time_type" label="发货周期" />
@@ -63,7 +64,7 @@
         <el-input v-model="templateForm.templateName" />
       </el-form-item>
       <el-form-item label="合作价格">
-        <el-input v-model="templateForm.price" />
+        <el-input v-model="templateForm.price" placeholder="价格已自动同步到商品的价格" :disabled="true" />
       </el-form-item>
 
       <el-form-item label="合作佣金率">
@@ -76,7 +77,11 @@
 
       <el-form-item label="发货周期">
         <el-select v-model="templateForm.delivery_time_type" default-first-option>
-          <el-option v-for="item of 4" :key="item" :label="item" :value="item" />
+          <el-option label="24小时" :value="0" />
+          <el-option label="48小时" :value="1" />
+          <el-option label="72小时" :value="2" />
+          <el-option label="4-7天" :value="3" />
+          <el-option label="7天以上" :value="4" />
         </el-select>
       </el-form-item>
 
@@ -188,7 +193,7 @@ selectedTemplateInfo.value = JSON.parse(str as string)
 let templateForm: any = reactive({})
 
 let timeout = ref(1);
-let batchNum = ref(100);
+let goodNUm = ref(100);
 
 let percentage = ref(1);
 
@@ -199,27 +204,31 @@ const dialogVisible = ref(false);
 const popoverVisible = ref(false);
 
 
-function getCurrentEventId() {
-  let match = document.URL.match(/event_id=\d+/);
-  if (match) return match[0].replace("event_id=", "");
-  else throw Error("查询evenid出错");
-}
 
-async function getPromotions(num: number): Promise<any[]> {
+
+async function getPromotions(num: number, event_id: number): Promise<any[]> {
   let res = await axios.get(
-    `https://buyin.jinritemai.com/api/bidding/event/promotion?page=1&pageSize=${num}&event_id=${getCurrentEventId()}`
+    `https://buyin.jinritemai.com/api/bidding/event/promotion?page=1&pageSize=${num}&event_id=${event_id()}`
   );
   if (res.data.msg === "success") {
     return res.data.data.map((item: any) => {
       return {
         promotion_id: item.promotion_id,
         institution_activity_id: item.institution_activity_id,
+        price: item.price
       };
     });
   } else {
-    return await getPromotions(num);
+    return await getPromotions(num, event_id);
   }
 }
+
+async function getDaren() {
+  let res = await axios.get((window as any).darenUrl)
+  let daren = res.data.data
+  return daren.map((item: any) => item.event_id)
+}
+
 const deleteRow = (index: number) => {
   templateInfos.value.splice(index, 1)
   saveTemplateInfos()
@@ -228,11 +237,22 @@ const deleteRow = (index: number) => {
     type: 'success'
   })
 }
+
 const start = async () => {
   loading.value = !loading.value;
+  let events = await getDaren()
+  for (const id of events) {
+    ElNotification(id+'达人处理完成。。。。。。。。。。。。。。。。')
+    start0(id)
+  }
+
+}
+
+const start0 = async (event_id: number) => {
+
   if (loading.value) {
     let tempData: any;
-    let promotions = await getPromotions(batchNum.value);
+    let promotions = await getPromotions(goodNUm.value, event_id);
 
     let index = 0;
     for (let promotion of promotions) {
@@ -247,9 +267,10 @@ const start = async () => {
 
       percentage.value = Math.round((index++ / promotions.length) * 100);
       tempData = {
-        event_id: getCurrentEventId(),
+        event_id,
         promotion_id: promotion.promotion_id,
         institution_activity_id: promotion.institution_activity_id,
+        price: promotion.price,
         ...selectedTemplateInfo.value,
       };
 
