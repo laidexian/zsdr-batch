@@ -1,21 +1,15 @@
 import { createApp } from "vue";
 import App from "./App.vue";
-import {
-  ElMessage,
-  ElMessageBox,
-  ElNotification
-} from 'element-plus'
+import { ElMessage } from "element-plus";
 
-import 'element-plus/es/components/message/style/css'
+import "element-plus/es/components/message/style/css";
+
+GM_registerMenuCommand("招商助手",()=>{
+  console.log('招商助手启动成功');
+  
+})
+
 createAppDiv();
-
-let str = localStorage.getItem("templateInfos");
-//模板信息
-
-
-
-
-
 
 const app = createApp(App);
 app.mount("#zsbatch");
@@ -38,3 +32,4 @@ const errorHandler = (error: any) => {
 };
 
 app.config.errorHandler = errorHandler;
+

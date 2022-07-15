@@ -6,3 +6,7 @@ declare module '*.vue' {
   const component: DefineComponent<{}, {}, any>
   export default component
 }
+
+
+declare function GM_registerMenuCommand(name: string, listener: Function, accessKey?: string): number;
+
