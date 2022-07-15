@@ -208,7 +208,7 @@ const popoverVisible = ref(false);
 
 async function getPromotions(num: number, event_id: number): Promise<any[]> {
   let res = await axios.get(
-    `https://buyin.jinritemai.com/api/bidding/event/promotion?page=1&pageSize=${num}&event_id=${event_id()}`
+    `https://buyin.jinritemai.com/api/bidding/event/promotion?page=1&pageSize=${num}&event_id=${event_id}`
   );
   if (res.data.msg === "success") {
     return res.data.data.map((item: any) => {
@@ -242,8 +242,16 @@ const start = async () => {
   loading.value = !loading.value;
   let events = await getDaren()
   for (const id of events) {
-    ElNotification(id+'达人处理完成。。。。。。。。。。。。。。。。')
-    start0(id)
+
+     if (!loading.value) {
+        ElMessage({
+          message: "手动停止",
+          type: "warning",
+        });
+        return;
+      }
+    await start0(id)
+    ElNotification(id + '达人处理完成。。。。。。。。。。。。。。。。')
   }
 
 }
@@ -275,6 +283,7 @@ const start0 = async (event_id: number) => {
       };
 
       let { data } = await signup(tempData);
+     
       if (data.msg === "success") {
         ElNotification({
           title: "报名成功！",
@@ -288,6 +297,12 @@ const start0 = async (event_id: number) => {
           type: "error",
         });
       }
+      //延迟处理
+       await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(null)
+        }, timeout.value);
+      })
     }
   }
 };
